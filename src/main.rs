@@ -13,8 +13,7 @@ fn fib(n: u32) -> num::BigUint {
 fn main() {
     let n = 100_000;
     let start = std::time::Instant::now();
-    fib(n);
-    // println!("Fibonacci of {} is: {}", n, result);
+    std::hint::black_box(fib(n)); // To prevent the compiler from optimizing away the computation
     let duration = start.elapsed();
     println!("Time taken: {:?}", duration);
 }

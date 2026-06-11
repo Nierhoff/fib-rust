@@ -106,6 +106,34 @@ jobs:
 
           test "$TAG_VERSION" = "$CARGO_VERSION"
 
+      - name: Build native CPU Linux release
+        env:
+          RUSTFLAGS: "-C target-cpu=native"
+        run: cargo build --release --bin fib-rust
+
+      - name: Package native CPU Linux release
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          tag="${{ github.ref_name }}"
+          package_name="fib-rust-$tag-linux-native"
+          package_dir="dist/$package_name"
+
+          mkdir -p "$package_dir"
+
+          cp target/release/fib-rust "$package_dir/"
+
+          if [[ -d assets ]]; then
+            cp -r assets "$package_dir/assets"
+          fi
+
+          test -f "$package_dir/fib-rust"
+          (
+            cd dist
+            zip -r "$package_name.zip" "$package_name"
+          )
+
       - name: Install cargo-pgo
         run: cargo install cargo-pgo --version "$CARGO_PGO_VERSION" --locked
 
@@ -154,13 +182,19 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           tag="${{ github.ref_name }}"
-          zip_path="dist/fib-rust-$tag-windows.zip"
+          windows_zip_path="dist/fib-rust-$tag-windows.zip"
+          linux_native_zip_path="dist/fib-rust-$tag-linux-native.zip"
 
           if gh release view "$tag" >/dev/null 2>&1; then
-            gh release upload "$tag" "$zip_path" --clobber
+            gh release upload "$tag" \
+              "$windows_zip_path" \
+              "$linux_native_zip_path" \
+              --clobber
           else
-            gh release create "$tag" "$zip_path" \
+            gh release create "$tag" \
+              "$windows_zip_path" \
+              "$linux_native_zip_path" \
               --title "$tag" \
-              --notes "Automated Windows release for $tag." \
+              --notes "Automated release for $tag." \
               --verify-tag
           fi
