@@ -1,0 +1,8 @@
+[package]
+name = "fib-rust"
+version = "0.1.0"
+edition = "2024"
+authors = ["Anders Nierhoff <anders.nierhoff@gmail.com>"]
+
+[dependencies]
+num = "0.4"
