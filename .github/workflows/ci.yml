@@ -12,6 +12,7 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
+  CARGO_PGO_VERSION: "0.3.0"
 
 jobs:
   build:
@@ -37,7 +38,7 @@ jobs:
 
       - uses: dtolnay/rust-toolchain@stable
         with:
-          components: rustfmt, clippy
+          components: rustfmt, clippy, llvm-tools-preview
           targets: x86_64-pc-windows-gnu, x86_64-unknown-linux-gnu
 
       - uses: Swatinem/rust-cache@v2
@@ -84,11 +85,12 @@ jobs:
             libwayland-dev \
             libxkbcommon-dev \
             gcc-mingw-w64-x86-64 \
+            wine \
             zip
 
       - uses: dtolnay/rust-toolchain@stable
         with:
-          components: rustfmt, clippy
+          components: rustfmt, clippy, llvm-tools-preview
           targets: x86_64-pc-windows-gnu, x86_64-unknown-linux-gnu
 
       - uses: Swatinem/rust-cache@v2
@@ -104,8 +106,20 @@ jobs:
 
           test "$TAG_VERSION" = "$CARGO_VERSION"
 
-      - name: Build Windows release
-        run: cargo build --release --target x86_64-pc-windows-gnu
+      - name: Install cargo-pgo
+        run: cargo install cargo-pgo --version "$CARGO_PGO_VERSION" --locked
+
+      - name: Build PGO-instrumented Windows release
+        run: cargo pgo build -- --target x86_64-pc-windows-gnu --bin fib-rust
+
+      - name: Gather Windows PGO profile
+        shell: bash
+        env:
+          WINEDEBUG: -all
+        run: wine target/x86_64-pc-windows-gnu/release/fib-rust.exe
+
+      - name: Build PGO-optimized Windows release
+        run: cargo pgo optimize build -- --target x86_64-pc-windows-gnu --bin fib-rust
 
       - name: Package Windows release
         shell: bash
