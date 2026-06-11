@@ -13,6 +13,7 @@ on:
 env:
   CARGO_TERM_COLOR: always
   CARGO_PGO_VERSION: "0.3.0"
+  CARGO_TARGET_X86_64_PC_WINDOWS_GNU_LINKER: x86_64-w64-mingw32-gcc
 
 jobs:
   build:
@@ -52,11 +53,7 @@ jobs:
       - name: Run Clippy
         run: cargo clippy --workspace --all-targets -- -D warnings
 
-      - name: Run simulation tests
-        run: cargo test
-
-      - name: Run Full tests
-        if: startsWith(github.ref, 'refs/tags/v')
+      - name: Run tests
         run: cargo test --workspace
 
   release:
@@ -177,6 +174,7 @@ jobs:
           )
 
       - name: Create or update GitHub release
+        if: startsWith(github.ref, 'refs/tags/v')
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
