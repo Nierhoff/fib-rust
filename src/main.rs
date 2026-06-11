@@ -1,5 +1,4 @@
-
-fn fib(n: u64) -> num::BigUint {
+fn fib(n: u32) -> num::BigUint {
     let mut a: num::BigUint = num::BigUint::ZERO;
     let mut b: num::BigUint = num::BigUint::from(1u32);
     let mut c: num::BigUint;
