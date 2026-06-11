@@ -97,7 +97,7 @@ jobs:
         run: |
           TAG_VERSION="${GITHUB_REF_NAME#v}"
           CARGO_VERSION=$(cargo metadata --no-deps --format-version 1 \
-            | jq -r '.packages[] | select(.name == "app") | .version')
+            | jq -r '.packages[] | select(.name == "fib-rust") | .version')
 
           echo "Tag version:   $TAG_VERSION"
           echo "Cargo version: $CARGO_VERSION"
@@ -105,7 +105,7 @@ jobs:
           test "$TAG_VERSION" = "$CARGO_VERSION"
 
       - name: Build Windows release
-        run: cargo build --release -p app --target x86_64-pc-windows-gnu
+        run: cargo build --release --target x86_64-pc-windows-gnu
 
       - name: Package Windows release
         shell: bash
