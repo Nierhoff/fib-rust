@@ -14,7 +14,7 @@ fn main() {
     let n = 100_000;
     let start = std::time::Instant::now();
     let result = fib(n);
-    println!("Fibonacci of {} is: {}", n, result);
+    // println!("Fibonacci of {} is: {}", n, result);
     let duration = start.elapsed();
     println!("Time taken: {:?}", duration);
 }

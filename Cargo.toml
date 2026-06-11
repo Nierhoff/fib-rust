@@ -6,3 +6,11 @@ authors = ["Anders Nierhoff <anders.nierhoff@gmail.com>"]
 
 [dependencies]
 num = "0.4"
+
+[profile.profiling]
+inherits = "dev"
+opt-level = 1
+debug = true
+
+[profile.release]
+opt-level = 3
