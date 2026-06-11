@@ -123,8 +123,17 @@ jobs:
 
           find "$target_dir" -maxdepth 2 -type f -iname "*.dll" \
             -exec cp -f {} "$package_dir/" \;
+          
+          if [[ -d assets ]]; then
+            cp -r assets "$package_dir/assets"
+          fi
 
-          cp "$package_dir/"
+          test -f "$package_dir/fib-rust.exe"
+          (
+            cd dist
+            zip -r "$package_name.zip" "$package_name"
+          )
+
       - name: Create or update GitHub release
         shell: bash
         env:
